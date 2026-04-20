@@ -1,0 +1,54 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>诗词背诵小站</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>诗词背诵小站</h1>
+    <p>选择诗词，默写练习，立刻查看结果</p>
+  </header>
+
+  <main class="container">
+    <section class="card controls">
+      <div class="field">
+        <label for="poemSelect">选择诗词</label>
+        <select id="poemSelect"></select>
+      </div>
+      <div class="button-row">
+        <button id="showHintBtn" type="button">显示提示</button>
+        <button id="showAnswerBtn" type="button" class="secondary">查看原文</button>
+      </div>
+    </section>
+
+    <section class="card poem-panel">
+      <h2 id="poemTitle">-</h2>
+      <p id="poemMeta" class="meta">-</p>
+      <p id="hintText" class="hint"></p>
+      <details id="fullPoemDetails">
+        <summary>点击展开原文</summary>
+        <pre id="fullPoemText"></pre>
+      </details>
+    </section>
+
+    <section class="card practice-panel">
+      <h3>默写区</h3>
+      <textarea id="practiceInput" rows="8" placeholder="在这里默写诗词内容..."></textarea>
+      <div class="button-row">
+        <button id="checkBtn" type="button">检查答案</button>
+        <button id="clearBtn" type="button" class="secondary">清空输入</button>
+      </div>
+      <div id="resultBox" class="result" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>坚持每天背诵 10 分钟，积少成多。</small>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
