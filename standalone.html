@@ -1,0 +1,385 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>诗词背诵小站</title>
+  <style>
+:root {
+  --bg: #f8f9ff;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --line: #e5e7eb;
+  --ok: #166534;
+  --warn: #9a3412;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  color: var(--text);
+  background: linear-gradient(160deg, #eef4ff 0%, #f8f9ff 55%, #f4f6fb 100%);
+  min-height: 100vh;
+}
+
+.site-header,
+.site-footer {
+  text-align: center;
+  padding: 1.25rem 1rem;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.site-header p,
+.site-footer small {
+  color: var(--muted);
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.field {
+  min-width: 260px;
+  flex: 1;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  outline: none;
+}
+
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+textarea {
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.button-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: var(--primary-dark);
+}
+
+button.secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+button.secondary:hover {
+  background: #d1d5db;
+}
+
+.meta {
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+.hint {
+  color: #334155;
+  font-size: 0.95rem;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+}
+
+pre {
+  margin: 0.8rem 0 0;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-family: inherit;
+}
+
+.result {
+  margin-top: 0.9rem;
+  min-height: 2.4rem;
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+}
+
+.result.good {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: var(--ok);
+}
+
+.result.warn {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: var(--warn);
+}
+
+@media (max-width: 640px) {
+  .site-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .card {
+    padding: 0.9rem;
+  }
+}
+
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <h1>诗词背诵小站</h1>
+    <p>选择诗词，默写练习，立刻查看结果</p>
+  </header>
+
+  <main class="container">
+    <section class="card controls">
+      <div class="field">
+        <label for="poemSelect">选择诗词</label>
+        <select id="poemSelect"></select>
+      </div>
+      <div class="button-row">
+        <button id="showHintBtn" type="button">显示提示</button>
+        <button id="showAnswerBtn" type="button" class="secondary">查看原文</button>
+      </div>
+    </section>
+
+    <section class="card poem-panel">
+      <h2 id="poemTitle">-</h2>
+      <p id="poemMeta" class="meta">-</p>
+      <p id="hintText" class="hint"></p>
+      <details id="fullPoemDetails">
+        <summary>点击展开原文</summary>
+        <pre id="fullPoemText"></pre>
+      </details>
+    </section>
+
+    <section class="card practice-panel">
+      <h3>默写区</h3>
+      <textarea id="practiceInput" rows="8" placeholder="在这里默写诗词内容..."></textarea>
+      <div class="button-row">
+        <button id="checkBtn" type="button">检查答案</button>
+        <button id="clearBtn" type="button" class="secondary">清空输入</button>
+      </div>
+      <div id="resultBox" class="result" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>坚持每天背诵 10 分钟，积少成多。</small>
+  </footer>
+
+  <script>
+const poems = [
+  {
+    id: 1,
+    title: "静夜思",
+    author: "李白",
+    dynasty: "唐",
+    content: "床前明月光，疑是地上霜。\n举头望明月，低头思故乡。"
+  },
+  {
+    id: 2,
+    title: "登鹳雀楼",
+    author: "王之涣",
+    dynasty: "唐",
+    content: "白日依山尽，黄河入海流。\n欲穷千里目，更上一层楼。"
+  },
+  {
+    id: 3,
+    title: "春晓",
+    author: "孟浩然",
+    dynasty: "唐",
+    content: "春眠不觉晓，处处闻啼鸟。\n夜来风雨声，花落知多少。"
+  },
+  {
+    id: 4,
+    title: "望庐山瀑布",
+    author: "李白",
+    dynasty: "唐",
+    content: "日照香炉生紫烟，遥看瀑布挂前川。\n飞流直下三千尺，疑是银河落九天。"
+  }
+];
+
+const poemSelect = document.getElementById("poemSelect");
+const poemTitle = document.getElementById("poemTitle");
+const poemMeta = document.getElementById("poemMeta");
+const hintText = document.getElementById("hintText");
+const fullPoemText = document.getElementById("fullPoemText");
+const fullPoemDetails = document.getElementById("fullPoemDetails");
+const practiceInput = document.getElementById("practiceInput");
+const resultBox = document.getElementById("resultBox");
+
+const showHintBtn = document.getElementById("showHintBtn");
+const showAnswerBtn = document.getElementById("showAnswerBtn");
+const checkBtn = document.getElementById("checkBtn");
+const clearBtn = document.getElementById("clearBtn");
+
+function normalize(text) {
+  return text
+    .replace(/[，。！？；、,.!?;\s]/g, "")
+    .trim();
+}
+
+function getCurrentPoem() {
+  const id = Number(poemSelect.value);
+  return poems.find((poem) => poem.id === id) || poems[0];
+}
+
+function makeHint(content) {
+  return content
+    .split("\n")
+    .map((line) => {
+      const clean = line.trim();
+      if (clean.length <= 2) {
+        return clean;
+      }
+      return `${clean.slice(0, 2)}...${clean.slice(-2)}`;
+    })
+    .join("\n");
+}
+
+function renderPoem() {
+  const poem = getCurrentPoem();
+  poemTitle.textContent = poem.title;
+  poemMeta.textContent = `${poem.dynasty} · ${poem.author}`;
+  hintText.textContent = "";
+  fullPoemText.textContent = poem.content;
+  fullPoemDetails.open = false;
+  resultBox.textContent = "";
+  resultBox.className = "result";
+  practiceInput.value = "";
+}
+
+function initPoemList() {
+  const optionsHtml = poems
+    .map((poem) => `<option value="${poem.id}">${poem.title}（${poem.author}）</option>`)
+    .join("");
+  poemSelect.innerHTML = optionsHtml;
+}
+
+function showHint() {
+  const poem = getCurrentPoem();
+  hintText.textContent = `提示：\n${makeHint(poem.content)}`;
+}
+
+function showAnswer() {
+  fullPoemDetails.open = true;
+}
+
+function checkAnswer() {
+  const poem = getCurrentPoem();
+  const expected = normalize(poem.content);
+  const actual = normalize(practiceInput.value);
+
+  if (!actual) {
+    resultBox.textContent = "请先默写后再检查。";
+    resultBox.className = "result warn";
+    return;
+  }
+
+  let score = Math.round((Math.min(actual.length, expected.length) / expected.length) * 100);
+
+  if (actual === expected) {
+    resultBox.textContent = "太棒了！默写完全正确，得分 100 分。";
+    resultBox.className = "result good";
+    return;
+  }
+
+  const prefixLen = longestCommonPrefix(expected, actual);
+  score = Math.max(Math.round((prefixLen / expected.length) * 100), 10);
+
+  resultBox.textContent = `继续加油，当前准确度约 ${score} 分。建议对照原文查漏补缺。`;
+  resultBox.className = "result warn";
+}
+
+function longestCommonPrefix(a, b) {
+  const len = Math.min(a.length, b.length);
+  let i = 0;
+  while (i < len && a[i] === b[i]) {
+    i += 1;
+  }
+  return i;
+}
+
+function clearInput() {
+  practiceInput.value = "";
+  resultBox.textContent = "已清空，可重新默写。";
+  resultBox.className = "result";
+}
+
+poemSelect.addEventListener("change", renderPoem);
+showHintBtn.addEventListener("click", showHint);
+showAnswerBtn.addEventListener("click", showAnswer);
+checkBtn.addEventListener("click", checkAnswer);
+clearBtn.addEventListener("click", clearInput);
+
+initPoemList();
+renderPoem();
+
+</script>
+</body>
+</html>
+
